@@ -24,7 +24,7 @@ export default class LoginScreen extends Component {
     axios
       .request({
         method: 'POST',
-        url: 'http://192.168.0.3:8001/api/v1/auth',
+        url: 'http://192.168.43.84:8000/api/v1/auth',
         data: {
           Nis: this.state.Nis,
           Password: this.state.Password,
