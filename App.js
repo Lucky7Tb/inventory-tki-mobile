@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Route from './src/Route';
 import OneSignal from 'react-native-onesignal';
-import {Provider as PaperProvider, DefaultTheme} from 'react-native-paper';
 
 export default class App extends Component {
   constructor(properties) {
@@ -10,10 +9,6 @@ export default class App extends Component {
   }
 
   render() {
-    return (
-      <PaperProvider>
-        <Route />
-      </PaperProvider>
-    );
+    return <Route />
   }
 }

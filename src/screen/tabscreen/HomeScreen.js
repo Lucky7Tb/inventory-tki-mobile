@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import { View, Image, BackHandler } from 'react-native';
+import { View, Image, BackHandler, Alert, StyleSheet, ActivityIndicator } from 'react-native';
 import { Header, Text, Avatar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'react-native-axios';
 import AsyncStorage from '@react-native-community/async-storage';
-import OneSignal from 'react-native-onesignal';
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -12,11 +11,16 @@ export default class HomeScreen extends Component {
     this._signOutAsync = this._signOutAsync.bind(this);
     this.state = {
       backHandle: '',
-      player_id: '',
       user_id: '',
+      data: {
+        borrowing: '',
+        notreturn: '',
+        nottaken: '',
+        returned: '',
+      },
+      loading: true,
     };
-    OneSignal.addEventListener('ids', this.onIds);
-  }
+  };
 
   _signOutAsync = async () => {
     await AsyncStorage.clear();
@@ -28,44 +32,58 @@ export default class HomeScreen extends Component {
       'hardwareBackPress',
       this.handleBackPress,
     );
-  }
+    this.getUserId();
+    this.getUserData();
+  };
 
   componentWillUnmount() {
-    OneSignal.removeEventListener('ids', this.onIds);
     this.backHandler.remove();
-  }
+  };
 
   handleBackPress = () => {
     BackHandler.exitApp();
     return true;
   };
 
-  onIds = async device => {
+  getUserId  = async () => {
     const user_id = await AsyncStorage.getItem('userId');
     this.setState({
       user_id: user_id,
     });
+  };
+
+  getUserData = async () => {
+    const user_id = await AsyncStorage.getItem('userId');
     axios.request({
-        method: 'POST',
-        url: 'http://192.168.43.84:8000/api/v1/student',
+      method: "POST",
+      url: "http://192.168.0.5:8000/api/v1/getstudentdata",
+      data:{
+        student_id : user_id
+      }
+    }).then(response => {
+      this.setState({
         data: {
-          student_id: user_id,
-          player_id: device.userId,
+          borrowing: response.data.serve.borrowing,
+          notreturn: response.data.serve.notreturn,
+          nottaken: response.data.serve.nottaken,
+          returned: response.data.serve.return,
         },
-        headers: {
-          'content-type': 'application/json',
-          accept: 'application/json',
-        },
-      }).then(response => {
-      
+        loading: false
       })
-      .catch(err => {
-        Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve");
-      });
+    }).catch(error => {
+      Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve")
+    })
   };
 
   render() {
     const { navigation } = this.props;
+    if(this.state.loading){
+      return(
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#0c9"/>
+        </View>
+    )}
+
     return (
       <View style={{height: 550}}>
           <Header
@@ -91,10 +109,10 @@ export default class HomeScreen extends Component {
             <View style={{flex:1, justifyContent: 'space-around', flexDirection: 'row', marginTop: 100}}>
 
               <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
-               
+
                 <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
 
-                <Text>12</Text>
+                <Text>{this.state.data.borrowing}</Text>
 
                 <Text>Dipinjam</Text>
 
@@ -102,11 +120,11 @@ export default class HomeScreen extends Component {
 
               <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
 
-               <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
+                <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
 
-                <Text>20</Text>
+                <Text>{this.state.data.returned}</Text>
 
-                <Text>Belum dikembalikan</Text>
+                <Text>Dikembalikan</Text>
 
               </View>
 
@@ -120,20 +138,22 @@ export default class HomeScreen extends Component {
 
                <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
 
-                <Text>12</Text>
+                <Text>{this.state.data.nottaken}</Text>
 
                 <Text>Belum Diambil</Text>
-                
+
               </View>
-               <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
+
+              <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
 
                <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
 
-                <Text>30</Text>
+                <Text>{this.state.data.notreturn}</Text>
 
-                <Text>Barang</Text>
-                
+                <Text>Belum dikembalikan</Text>
+
               </View>
+            
             </View>
           </View>
 
@@ -141,3 +161,12 @@ export default class HomeScreen extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+   loader:{
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff"
+   },
+})

@@ -1,24 +1,6 @@
 import React, {Component} from 'react';
-import {
-  StyleSheet,
-  Modal,
-  View,
-  Alert,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-  FlatList
-} from 'react-native';
-import {
-  ListItem,
-  Button,
-  Input,
-  Header,
-  Card,
-  Text,
-  SearchBar,
-} from 'react-native-elements';
+import { StyleSheet, Modal, View, Alert, ScrollView, Image, TouchableOpacity, ActivityIndicator,FlatList } from 'react-native';
+import { ListItem, Button, Input, Header, Card, Text, SearchBar } from 'react-native-elements';
 import {createFilter} from 'react-native-search-filter';
 import Loading from 'react-native-whc-loading'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -42,12 +24,12 @@ export default class BorrowScreen extends Component {
       modal_visible: false,
       loading: true,
     };
-  }
+  };
 
   componentDidMount() {
     this.getItem();
     this.getUserId();
-  }
+  };
 
   showModal = (id, name) => {
     this.setState({
@@ -70,18 +52,13 @@ export default class BorrowScreen extends Component {
     });
   };
 
-  getItem = async () => {
-    await axios.request({
+  getItem = () => {
+    axios.request({
         method: 'GET',
-        url: 'http://192.168.43.84:8000/api/v1/item',
-        headers: {
-          'content-type': 'application/json',
-          accept: 'application/json',
-        },
+        url: 'http://192.168.0.5:8000/api/v1/item',
       })
       .then(response => {
-        let dataItem = response.data.serve;
-        this.setState({item: dataItem, loading: false,});
+        this.setState({item: response.data.serve, loading: false});
       })
       .catch(err => {
         Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve")
@@ -99,7 +76,7 @@ export default class BorrowScreen extends Component {
     }else{
       axios.request({
         method: 'POST',
-        url: 'http://192.168.43.84:8000/api/v1/borrow',
+        url: 'http://192.168.0.5:8000/api/v1/borrow',
         data: {
           student_id: this.state.user_id,
           item_id: this.state.item_id,
@@ -149,8 +126,8 @@ export default class BorrowScreen extends Component {
     const { item } = this.state;
     const items = item.filter(createFilter(this.state.keyword, 'item_name'));
     if(this.state.loading){
-      return( 
-        <View style={styles.loader}> 
+      return(
+        <View style={styles.loader}>
           <ActivityIndicator size="large" color="#0c9"/>
         </View>
     )}
@@ -182,20 +159,20 @@ export default class BorrowScreen extends Component {
           value={this.state.keyword}
           placeholder="Cari barang"
         />
-        
+
         <FlatList
           keyExtractor={this.keyExtractor}
           data={items}
           renderItem={this.renderItem}
         />
-      
+
         <Modal
           animationType="slide"
           transparent={false}
           visible={this.state.modal_visible}
           onRequestClose={this.closeModal}>
           <View>
-            <Loading 
+            <Loading
               ref="loading"
               backgroundColor='#fff'
               borderRadius={5}

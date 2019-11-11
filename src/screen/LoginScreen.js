@@ -3,8 +3,8 @@ import {Input, Button, Image} from 'react-native-elements';
 import {StyleSheet, View, BackHandler, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
+import OneSignal from 'react-native-onesignal';
 import axios from 'react-native-axios';
-
 export default class LoginScreen extends Component {
   static navigationOptions = {
     header: null,
@@ -16,6 +16,9 @@ export default class LoginScreen extends Component {
       Nis: '',
       Password: '',
       loading: false,
+      player_id: '',
+      user_id: '',
+      backHandle: '',
     };
   }
 
@@ -24,14 +27,10 @@ export default class LoginScreen extends Component {
     axios
       .request({
         method: 'POST',
-        url: 'http://192.168.43.84:8000/api/v1/auth',
+        url: 'http://192.168.0.5:8000/api/v1/auth',
         data: {
           Nis: this.state.Nis,
           Password: this.state.Password,
-        },
-        headers: {
-          'content-type': 'application/json',
-          accept: 'application/json',
         },
       })
       .then(async response => {
@@ -42,6 +41,7 @@ export default class LoginScreen extends Component {
               response.data.serve.student_id,
             );
             this.setState({loading: false});
+            OneSignal.addEventListener('ids', this.onIds);
             this.props.navigation.navigate('Home');
           } catch (e) {
             console.log(e);
@@ -61,8 +61,24 @@ export default class LoginScreen extends Component {
       });
   };
 
-  state: {
-    backHandle: '',
+  onIds = async device => {
+    const user_id = await AsyncStorage.getItem('userId');
+    this.setState({
+      user_id: user_id,
+    });
+    axios.request({
+        method: 'POST',
+        url: 'http://192.168.0.5:8000/api/v1/student',
+        data: {
+          student_id: user_id,
+          player_id: device.userId,
+        },
+      }).then(response => {
+
+      })
+      .catch(err => {
+        Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve");
+      });
   };
 
   componentDidMount() {
@@ -73,6 +89,7 @@ export default class LoginScreen extends Component {
   }
 
   componentWillUnmount() {
+    OneSignal.removeEventListener('ids', this.onIds);
     this.backHandler.remove();
   }
 
