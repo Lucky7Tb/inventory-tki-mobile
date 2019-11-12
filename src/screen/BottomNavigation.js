@@ -6,10 +6,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import History from './tabscreen/HistoryScreen';
 import Borrow from './tabscreen/BorrowScreen';
 import Home from './tabscreen/HomeScreen';
+import ChangePassword from './tabscreen/ChangePasswordScreen';
 import Login from './LoginScreen';
 
 const Route = {
-  Login: Login
+  Login: Login,
+  ChangePassword: ChangePassword,
 };
 
 const HomeStack = createStackNavigator({

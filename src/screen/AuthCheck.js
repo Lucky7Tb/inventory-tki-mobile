@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View} from 'react-native';
+import {View ,Image} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default class AuthLoadingScreen extends Component {
@@ -17,7 +17,11 @@ export default class AuthLoadingScreen extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{justifyContent: 'center',  alignItems: "center", flex:1}}>
+        <Image
+          source={require('../assets/logo.png')}
+          style={{width: 250, height:250}}
+        />
       </View>
     );
   }

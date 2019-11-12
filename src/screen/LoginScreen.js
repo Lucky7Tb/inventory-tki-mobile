@@ -16,6 +16,7 @@ export default class LoginScreen extends Component {
       Nis: '',
       Password: '',
       loading: false,
+      disabled: false,
       player_id: '',
       user_id: '',
       backHandle: '',
@@ -23,11 +24,11 @@ export default class LoginScreen extends Component {
   }
 
   Login = () => {
-    this.setState({loading: true});
+    this.setState({loading: true, disabled: true});
     axios
       .request({
         method: 'POST',
-        url: 'http://192.168.0.5:8000/api/v1/auth',
+        url: 'http://192.168.0.2:8000/api/v1/auth',
         data: {
           Nis: this.state.Nis,
           Password: this.state.Password,
@@ -40,7 +41,7 @@ export default class LoginScreen extends Component {
               'userId',
               response.data.serve.student_id,
             );
-            this.setState({loading: false});
+            this.setState({loading: false, disabled: false});
             OneSignal.addEventListener('ids', this.onIds);
             this.props.navigation.navigate('Home');
           } catch (e) {
@@ -51,13 +52,11 @@ export default class LoginScreen extends Component {
             'Nis atau password salah',
             'Harap cek kembali nis dan password',
           );
-          this.setState({loading: false});
+          this.setState({loading: false, disabled: false});
         }
-        console.log(response.data.message);
-        console.log(response.data.serve);
       })
       .catch(err => {
-        console.log(err);
+        Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve")
       });
   };
 
@@ -134,6 +133,7 @@ export default class LoginScreen extends Component {
               onPress={this.Login.bind(this)}
               title="Login"
               loading={this.state.loading}
+              disabled={this.state.disabled}
             />
           </View>
         </View>

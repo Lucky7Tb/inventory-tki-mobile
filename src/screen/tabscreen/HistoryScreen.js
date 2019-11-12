@@ -23,7 +23,7 @@ export default class HistoryScreen extends Component{
     const user_id = await AsyncStorage.getItem('userId');
     axios.request({
       method: "POST",
-      url: "http://192.168.0.5:8000/api/v1/getborrowdata",
+      url: "http://192.168.0.2:8000/api/v1/getborrowdata",
       data: { 
         student_id : user_id
       }

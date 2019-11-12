@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import { View, Image, BackHandler, Alert, StyleSheet, ActivityIndicator } from 'react-native';
-import { Header, Text, Avatar } from 'react-native-elements';
+import { View, Image, BackHandler, Alert, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Header, Text, Avatar, Overlay } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'react-native-axios';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -9,6 +9,10 @@ export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this._signOutAsync = this._signOutAsync.bind(this);
+    this.logout = this.logout.bind(this);
+    this.changePassword = this.changePassword.bind(this);
+    this.showSettingsMenu = this.showSettingsMenu.bind(this);
+    this.closeSettingsMenu = this.closeSettingsMenu.bind(this);
     this.state = {
       backHandle: '',
       user_id: '',
@@ -19,12 +23,38 @@ export default class HomeScreen extends Component {
         returned: '',
       },
       loading: true,
+      overlay: false
     };
   };
 
   _signOutAsync = async () => {
     await AsyncStorage.clear();
+    this.setState({overlay: false});
     this.props.navigation.navigate("Login");
+  };
+
+  logout = () => {
+  	Alert.alert(
+  		"Konfirmasi", 
+  		"Anda yakin ingin keluar",
+  		[
+		    { text: 'Cancel' },
+		    { text: 'Ok', onPress: this._signOutAsync },
+	  	],
+  	)
+  };
+
+  changePassword = () => {
+  	this.setState({overlay: false});
+  	this.props.navigation.navigate('ChangePassword');
+  }
+
+  showSettingsMenu = () => {
+   	this.setState({overlay: true})
+  };
+
+  closeSettingsMenu = () => {
+   	this.setState({overlay: false})
   };
 
   componentDidMount() {
@@ -56,7 +86,7 @@ export default class HomeScreen extends Component {
     const user_id = await AsyncStorage.getItem('userId');
     axios.request({
       method: "POST",
-      url: "http://192.168.0.5:8000/api/v1/getstudentdata",
+      url: "http://192.168.0.2:8000/api/v1/getstudentdata",
       data:{
         student_id : user_id
       }
@@ -90,17 +120,17 @@ export default class HomeScreen extends Component {
             placement="left"
             leftComponent={
               <Image
-  			        source={require('../../assets/logo.png')}
-  			        style={{width: 100, height: 100, marginBottom: 20}}
-  			     />
+		        source={require('../../assets/logo.png')}
+		        style={{width: 100, height: 100, marginBottom: 20}}
+  			   />
             }
             rightComponent={
               <Icon
-                name="sign-out"
+                name="align-justify"
                 color="#fff"
                 size={20}
                 style={{marginBottom: 20}}
-                onPress={this._signOutAsync}
+                onPress={this.showSettingsMenu}
               />
             }
           />
@@ -157,6 +187,35 @@ export default class HomeScreen extends Component {
             </View>
           </View>
 
+
+		<Overlay
+		  isVisible={this.state.overlay}
+		
+		  width={250}
+		  height={250}
+		  onBackdropPress={this.closeSettingsMenu}
+		>
+		  <View style={{flex:1}}>
+		  	<View style={{flex: 1, justifyContent: 'center'}}>
+		  		<TouchableOpacity
+		  			style={styles.buttonStyle}
+        			onPress={this.changePassword}
+		  		>
+		  			<Text style={{color:'#039be5'}}>Ganti Password</Text>
+		  		</TouchableOpacity>
+		  	</View>
+		  	<View style={{flex: 1, justifyContent: 'center'}}>
+		  		<TouchableOpacity
+		  			style={styles.buttonStyle}
+        			onPress={this.logout}
+		  		>
+		  			<Text style={{color:'#039be5'}}>Logout</Text>
+		  		</TouchableOpacity>
+		  	</View>
+		  </View>
+
+		</Overlay>
+
       </View>
     );
   }
@@ -169,4 +228,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff"
    },
+   buttonStyle:{
+   	backgroundColor: "#fff",
+   	alignItems: 'center',
+   }
 })

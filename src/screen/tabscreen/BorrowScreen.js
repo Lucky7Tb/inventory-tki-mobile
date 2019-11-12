@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import { StyleSheet, Modal, View, Alert, ScrollView, Image, TouchableOpacity, ActivityIndicator,FlatList } from 'react-native';
-import { ListItem, Button, Input, Header, Card, Text, SearchBar } from 'react-native-elements';
+import { StyleSheet, Modal, View, Alert, Image, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import { Button, Input, Header, Card, Text, SearchBar, Overlay } from 'react-native-elements';
 import {createFilter} from 'react-native-search-filter';
 import Loading from 'react-native-whc-loading'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -11,6 +11,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 export default class BorrowScreen extends Component {
   constructor(props) {
     super(props);
+     this._signOutAsync = this._signOutAsync.bind(this);
+    this.logout = this.logout.bind(this);
+    this.showSettingsMenu = this.showSettingsMenu.bind(this);
+    this.closeSettingsMenu = this.closeSettingsMenu.bind(this);
     this.showModal = this.showModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.borrowItem = this.borrowItem.bind(this);
@@ -23,12 +27,38 @@ export default class BorrowScreen extends Component {
       keyword: '',
       modal_visible: false,
       loading: true,
+      overlay: false
     };
   };
 
   componentDidMount() {
     this.getItem();
     this.getUserId();
+  };
+
+   _signOutAsync = async () => {
+    await AsyncStorage.clear();
+    this.setState({overlay: false});
+    this.props.navigation.navigate("Login");
+  };
+
+  logout = () => {
+  	Alert.alert(
+  		"Konfirmasi", 
+  		"Anda yakin ingin keluar",
+  		[
+		    { text: 'Cancel' },
+		    { text: 'Ok', onPress: this._signOutAsync },
+	  	],
+  	)
+  };
+
+  showSettingsMenu = () => {
+   	this.setState({overlay: true})
+  };
+
+  closeSettingsMenu = () => {
+   	this.setState({overlay: false})
   };
 
   showModal = (id, name) => {
@@ -55,7 +85,7 @@ export default class BorrowScreen extends Component {
   getItem = () => {
     axios.request({
         method: 'GET',
-        url: 'http://192.168.0.5:8000/api/v1/item',
+        url: 'http://192.168.0.2:8000/api/v1/item',
       })
       .then(response => {
         this.setState({item: response.data.serve, loading: false});
@@ -76,7 +106,7 @@ export default class BorrowScreen extends Component {
     }else{
       axios.request({
         method: 'POST',
-        url: 'http://192.168.0.5:8000/api/v1/borrow',
+        url: 'http://192.168.0.2:8000/api/v1/borrow',
         data: {
           student_id: this.state.user_id,
           item_id: this.state.item_id,
@@ -135,24 +165,23 @@ export default class BorrowScreen extends Component {
     return (
       <View style={{height: 550}}>
         <Header
-          placement="left"
-          leftComponent={
-          <Image
-            source={require('../../assets/logo.png')}
-            style={{width: 100, height: 100, marginBottom: 20}}
-          />}
-          rightComponent={
-            <Icon
-              name="user"
-              color="#fff"
-              size={20}
-              style={{marginBottom: 20}}
-              onPress={() => {
-                this.props.navigation.navigate('Login');
-              }}
-            />
-          }
-        />
+            placement="left"
+            leftComponent={
+              <Image
+		        source={require('../../assets/logo.png')}
+		        style={{width: 100, height: 100, marginBottom: 20}}
+  			   />
+            }
+            rightComponent={
+              <Icon
+                name="align-justify"
+                color="#fff"
+                size={20}
+                style={{marginBottom: 20}}
+                onPress={this.showSettingsMenu}
+              />
+            }
+          />
         <SearchBar
           platform="android"
           onChangeText={keyword => this.setState({keyword})}
@@ -209,6 +238,34 @@ export default class BorrowScreen extends Component {
 
           </View>
         </Modal>
+
+        <Overlay
+		  isVisible={this.state.overlay}
+		
+		  width={250}
+		  height={250}
+		  onBackdropPress={this.closeSettingsMenu}
+		>
+		  <View style={{flex:1}}>
+		  	<View style={{flex: 1, justifyContent: 'center'}}>
+		  		<TouchableOpacity
+		  			style={styles.buttonStyle}
+        			onPress={this._signOutAsync}
+		  		>
+		  			<Text style={{color:'#039be5'}}>Ganti Password</Text>
+		  		</TouchableOpacity>
+		  	</View>
+		  	<View style={{flex: 1, justifyContent: 'center'}}>
+		  		<TouchableOpacity
+		  			style={styles.buttonStyle}
+        			onPress={this.logout}
+		  		>
+		  			<Text style={{color:'#039be5'}}>Logout</Text>
+		  		</TouchableOpacity>
+		  	</View>
+		  </View>
+
+		</Overlay>
       </View>
     );
   }
@@ -241,4 +298,8 @@ const styles = StyleSheet.create({
   label: {
     paddingBottom: 10,
   },
+  buttonStyle:{
+   	backgroundColor: "#fff",
+   	alignItems: 'center',
+   }
 });
