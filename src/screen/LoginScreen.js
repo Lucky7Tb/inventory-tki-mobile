@@ -12,6 +12,7 @@ export default class LoginScreen extends Component {
 
   constructor(props) {
     super(props);
+    this.Login = this.Login.bind(this);
     this.state = {
       Nis: '',
       Password: '',
@@ -28,7 +29,7 @@ export default class LoginScreen extends Component {
     axios
       .request({
         method: 'POST',
-        url: 'http://192.168.0.2:8000/api/v1/auth',
+        url: 'http://192.168.0.5:8000/api/v1/auth',
         data: {
           Nis: this.state.Nis,
           Password: this.state.Password,
@@ -56,7 +57,8 @@ export default class LoginScreen extends Component {
         }
       })
       .catch(err => {
-        Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve")
+        this.setState({loading: false, disabled: false});
+        Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve");
       });
   };
 
@@ -67,7 +69,7 @@ export default class LoginScreen extends Component {
     });
     axios.request({
         method: 'POST',
-        url: 'http://192.168.0.5:8000/api/v1/student',
+        url: 'http://192.168.43.84:8000/api/v1/student',
         data: {
           student_id: user_id,
           player_id: device.userId,
@@ -77,6 +79,7 @@ export default class LoginScreen extends Component {
       })
       .catch(err => {
         Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve");
+        console.log(err)
       });
   };
 
@@ -110,30 +113,35 @@ export default class LoginScreen extends Component {
           <Input
             containerStyle={styles.nisfieldcontainer}
             inputContainerStyle={styles.fieldcontainer}
+            leftIconContainerStyle={styles.iconcontainer}
             label="Nis"
             labelStyle={styles.label}
             placeholder="e.g 171810518"
             onChangeText={Nis => this.setState({Nis})}
-            leftIcon={<Icon name="user" size={20} color="#000" />}
+            leftIcon={<Icon name="user" size={20} color="#31AFB4" />}
           />
           <Input
             containerStyle={styles.passwordfieldcontainer}
             inputContainerStyle={styles.fieldcontainer}
+            leftIconContainerStyle={styles.iconcontainer}
             label="Password"
             labelStyle={styles.label}
             secureTextEntry={true}
             placeholder="Password"
             onChangeText={Password => this.setState({Password})}
-            leftIcon={<Icon name="lock" size={20} color="#000" />}
+            leftIcon={<Icon name="lock" size={20} color="#31AFB4" />}
           />
 
           <View style={styles.loginbuttoncontainer}>
             <Button
               buttonStyle={styles.loginbutton}
-              onPress={this.Login.bind(this)}
-              title="Login"
+              titleStyle={{fontWeight: 'bold', fontSize:15}}
+              onPress={this.Login}
+              title="LOGIN"
               loading={this.state.loading}
               disabled={this.state.disabled}
+              raised={true}
+              type="solid"
             />
           </View>
         </View>
@@ -159,9 +167,12 @@ const styles = StyleSheet.create({
   fieldcontainer: {
     borderStyle: 'solid',
     borderWidth: 1,
-    borderRadius: 10,
-    borderColor: '#039be5',
+    borderRadius: 15,
+    borderColor: '#31AFB4',
     backgroundColor: '#fff',
+  },
+  iconcontainer:{
+    marginRight: 10
   },
   form: {
     flex: 1,
@@ -173,11 +184,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loginbutton: {
-    borderRadius: 90,
-    borderWidth: 1,
+    borderRadius: 25,
     width: 250,
-    backgroundColor: '#039be5',
+    backgroundColor: '#31AFB4',
     borderColor: 'transparent',
+    elevation: 0.50
   },
   loginbuttoncontainer: {
     justifyContent: 'center',

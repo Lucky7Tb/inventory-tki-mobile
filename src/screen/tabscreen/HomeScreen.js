@@ -86,7 +86,7 @@ export default class HomeScreen extends Component {
     const user_id = await AsyncStorage.getItem('userId');
     axios.request({
       method: "POST",
-      url: "http://192.168.0.2:8000/api/v1/getstudentdata",
+      url: "http://192.168.0.5:8000/api/v1/getstudentdata",
       data:{
         student_id : user_id
       }
@@ -101,7 +101,8 @@ export default class HomeScreen extends Component {
         loading: false
       })
     }).catch(error => {
-      Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve")
+      console.log(error);
+      Alert.alert("Terjadi kesalahan", "Salah")
     })
   };
 
@@ -126,7 +127,7 @@ export default class HomeScreen extends Component {
             }
             rightComponent={
               <Icon
-                name="align-justify"
+                name="bars"
                 color="#fff"
                 size={20}
                 style={{marginBottom: 20}}

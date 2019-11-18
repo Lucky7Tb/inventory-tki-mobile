@@ -85,7 +85,7 @@ export default class BorrowScreen extends Component {
   getItem = () => {
     axios.request({
         method: 'GET',
-        url: 'http://192.168.0.2:8000/api/v1/item',
+        url: 'http://192.168.0.5:8000/api/v1/item',
       })
       .then(response => {
         this.setState({item: response.data.serve, loading: false});
@@ -106,7 +106,7 @@ export default class BorrowScreen extends Component {
     }else{
       axios.request({
         method: 'POST',
-        url: 'http://192.168.0.2:8000/api/v1/borrow',
+        url: 'http://192.168.0.5:8000/api/v1/borrow',
         data: {
           student_id: this.state.user_id,
           item_id: this.state.item_id,
@@ -142,11 +142,13 @@ export default class BorrowScreen extends Component {
       <View style={styles.buttonContainer}>
         <Button
           buttonStyle={styles.submitButton}
+          titleStyle={{fontWeight: 'bold'}}
           onPress={() => {
             this.showModal(item.item_id, item.item_name);
           }}
           title="Pinjam"
-          type="clear"
+          type="solid"
+          raised={true}
         />
       </View>
     </Card>
@@ -168,13 +170,13 @@ export default class BorrowScreen extends Component {
             placement="left"
             leftComponent={
               <Image
-		        source={require('../../assets/logo.png')}
-		        style={{width: 100, height: 100, marginBottom: 20}}
-  			   />
+    		        source={require('../../assets/logo.png')}
+    		        style={{width: 100, height: 100, marginBottom: 20}}
+    			   />
             }
             rightComponent={
               <Icon
-                name="align-justify"
+                name="bars"
                 color="#fff"
                 size={20}
                 style={{marginBottom: 20}}
@@ -183,7 +185,24 @@ export default class BorrowScreen extends Component {
             }
           />
         <SearchBar
-          platform="android"
+          lightTheme={true}
+          round={true}
+          inputStyle={{backgroundColor:'#fff'}}
+          inputContainerStyle={{backgroundColor:'#fff'}}
+          searchIcon={ 
+            <Icon
+              name="search"
+              size={20}
+              color="#86939e"
+            />
+          }
+          clearIcon={
+            <Icon
+              name="times"
+              size={20}
+              color="#86939e"
+            />
+          }
           onChangeText={keyword => this.setState({keyword})}
           value={this.state.keyword}
           placeholder="Cari barang"
@@ -231,7 +250,7 @@ export default class BorrowScreen extends Component {
               <Button
                 onPress={this.borrowItem}
                 title="Pinjam"
-                type="outline"
+                type="solid"
                 buttonStyle={styles.submitButton}
               />
             </View>
@@ -240,12 +259,11 @@ export default class BorrowScreen extends Component {
         </Modal>
 
         <Overlay
-		  isVisible={this.state.overlay}
-		
-		  width={250}
-		  height={250}
-		  onBackdropPress={this.closeSettingsMenu}
-		>
+    		  isVisible={this.state.overlay}
+    		  width={250}
+    		  height={250}
+    		  onBackdropPress={this.closeSettingsMenu}
+    		>
 		  <View style={{flex:1}}>
 		  	<View style={{flex: 1, justifyContent: 'center'}}>
 		  		<TouchableOpacity
@@ -273,14 +291,16 @@ export default class BorrowScreen extends Component {
 
 const styles = StyleSheet.create({
   submitButton: {
-    borderRadius: 90,
-    borderWidth: 1,
+    borderRadius: 25,
     width: 250,
-    marginTop: 25
+    backgroundColor: '#039be5',
+    borderColor: 'transparent',
+    elevation: 0.50,
   },
   buttonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 25
   },
   loader:{
     flex: 1,

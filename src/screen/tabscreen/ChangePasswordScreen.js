@@ -26,7 +26,7 @@ export default class ChangePasswordScreen extends Component {
   		}else{
   			axios.request({
   				method: 'POST',
-  				url: 'http://192.168.0.2:8000/api/v1/studentchangepassword',
+  				url: 'http://192.168.0.5:8000/api/v1/studentchangepassword',
   				data: {
   					student_id : user_id,
   					student_password: password
