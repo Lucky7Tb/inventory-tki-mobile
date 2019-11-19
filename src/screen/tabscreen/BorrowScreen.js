@@ -11,8 +11,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 export default class BorrowScreen extends Component {
   constructor(props) {
     super(props);
-     this._signOutAsync = this._signOutAsync.bind(this);
+    this._signOutAsync = this._signOutAsync.bind(this);
     this.logout = this.logout.bind(this);
+    this.changePassword = this.changePassword.bind(this);
     this.showSettingsMenu = this.showSettingsMenu.bind(this);
     this.closeSettingsMenu = this.closeSettingsMenu.bind(this);
     this.showModal = this.showModal.bind(this);
@@ -25,6 +26,7 @@ export default class BorrowScreen extends Component {
       item_name: '',
       item_ammount: '',
       keyword: '',
+      refreshloader: false,
       modal_visible: false,
       loading: true,
       overlay: false
@@ -40,6 +42,11 @@ export default class BorrowScreen extends Component {
     await AsyncStorage.clear();
     this.setState({overlay: false});
     this.props.navigation.navigate("Login");
+  };
+
+  changePassword = () => {
+    this.setState({overlay: false});
+    this.props.navigation.navigate('ChangePassword');
   };
 
   logout = () => {
@@ -85,7 +92,7 @@ export default class BorrowScreen extends Component {
   getItem = () => {
     axios.request({
         method: 'GET',
-        url: 'http://192.168.0.5:8000/api/v1/item',
+        url: 'http://192.168.0.4:8000/api/v1/item',
       })
       .then(response => {
         this.setState({item: response.data.serve, loading: false});
@@ -106,7 +113,7 @@ export default class BorrowScreen extends Component {
     }else{
       axios.request({
         method: 'POST',
-        url: 'http://192.168.0.5:8000/api/v1/borrow',
+        url: 'http://192.168.0.4:8000/api/v1/borrow',
         data: {
           student_id: this.state.user_id,
           item_id: this.state.item_id,
@@ -131,6 +138,19 @@ export default class BorrowScreen extends Component {
       });
     }
   };
+
+  wait = timeout => {
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  }
+
+  refresh = () => {
+    this.setState({refreshloader: true})
+    this.getItem()
+    this.wait(2000).then( () => this.setState({refreshloader: false}) )
+  };
+
 
   keyExtractor = (item, index) => index.toString()
 
@@ -160,7 +180,7 @@ export default class BorrowScreen extends Component {
     if(this.state.loading){
       return(
         <View style={styles.loader}>
-          <ActivityIndicator size="large" color="#0c9"/>
+          <ActivityIndicator size="large" color="#31AFB4"/>
         </View>
     )}
 
@@ -168,12 +188,7 @@ export default class BorrowScreen extends Component {
       <View style={{height: 550}}>
         <Header
             placement="left"
-            leftComponent={
-              <Image
-    		        source={require('../../assets/logo.png')}
-    		        style={{width: 100, height: 100, marginBottom: 20}}
-    			   />
-            }
+            backgroundColor="#31AFB4"
             rightComponent={
               <Icon
                 name="bars"
@@ -212,6 +227,8 @@ export default class BorrowScreen extends Component {
           keyExtractor={this.keyExtractor}
           data={items}
           renderItem={this.renderItem}
+          refreshing={this.state.refreshloader}
+          onRefresh={this.refresh}
         />
 
         <Modal
@@ -251,6 +268,7 @@ export default class BorrowScreen extends Component {
                 onPress={this.borrowItem}
                 title="Pinjam"
                 type="solid"
+                raised={true}
                 buttonStyle={styles.submitButton}
               />
             </View>
@@ -264,26 +282,25 @@ export default class BorrowScreen extends Component {
     		  height={250}
     		  onBackdropPress={this.closeSettingsMenu}
     		>
-		  <View style={{flex:1}}>
-		  	<View style={{flex: 1, justifyContent: 'center'}}>
-		  		<TouchableOpacity
-		  			style={styles.buttonStyle}
-        			onPress={this._signOutAsync}
-		  		>
-		  			<Text style={{color:'#039be5'}}>Ganti Password</Text>
-		  		</TouchableOpacity>
-		  	</View>
-		  	<View style={{flex: 1, justifyContent: 'center'}}>
-		  		<TouchableOpacity
-		  			style={styles.buttonStyle}
-        			onPress={this.logout}
-		  		>
-		  			<Text style={{color:'#039be5'}}>Logout</Text>
-		  		</TouchableOpacity>
-		  	</View>
-		  </View>
-
-		</Overlay>
+    		  <View style={{flex:1}}>
+    		  	<View style={{flex: 1, justifyContent: 'center'}}>
+    		  		<TouchableOpacity
+    		  			style={styles.buttonStyle}
+            			onPress={this.changePassword}
+    		  		>
+    		  			<Text style={{color:'#31AFB4'}}>Ganti Password</Text>
+    		  		</TouchableOpacity>
+    		  	</View>
+    		  	<View style={{flex: 1, justifyContent: 'center'}}>
+      		  		<TouchableOpacity
+      		  			style={styles.buttonStyle}
+              		onPress={this.logout}
+      		  		>
+    		  			<Text style={{color:'#31AFB4'}}>Logout</Text>
+    		  		</TouchableOpacity>
+    		  	</View>
+    		  </View>
+		    </Overlay>
       </View>
     );
   }
@@ -293,7 +310,7 @@ const styles = StyleSheet.create({
   submitButton: {
     borderRadius: 25,
     width: 250,
-    backgroundColor: '#039be5',
+    backgroundColor: '#31AFB4',
     borderColor: 'transparent',
     elevation: 0.50,
   },
@@ -312,14 +329,16 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 1,
     borderRadius: 10,
-    borderColor: '#039be5',
+    borderColor: '#31AFB4',
     backgroundColor: '#fff',
   },
   label: {
     paddingBottom: 10,
   },
   buttonStyle:{
-   	backgroundColor: "#fff",
-   	alignItems: 'center',
+   	backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center",
+    height:50
    }
 });

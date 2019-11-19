@@ -26,7 +26,7 @@ export default class ChangePasswordScreen extends Component {
   		}else{
   			axios.request({
   				method: 'POST',
-  				url: 'http://192.168.0.5:8000/api/v1/studentchangepassword',
+  				url: 'http://192.168.0.4:8000/api/v1/studentchangepassword',
   				data: {
   					student_id : user_id,
   					student_password: password
@@ -63,7 +63,8 @@ export default class ChangePasswordScreen extends Component {
           <Button
             onPress={this.changePassword}
             title="Save"
-            type="outline"
+            type="solid"
+            raised={true}
             buttonStyle={styles.submitButton}
           />
         </View>
@@ -82,14 +83,15 @@ const styles = StyleSheet.create({
     	borderStyle: 'solid',
 	    borderWidth: 1,
 	    borderRadius: 10,
-	    borderColor: '#039be5',
+	    borderColor: '#31AFB4',
 	    backgroundColor: '#fff',
 	    marginBottom: 20
   	},
    submitButton: {
-	    borderRadius: 90,
-	    borderWidth: 1,
+	    borderRadius: 25,
 	    width: 250,
-	    marginTop: 25
+      backgroundColor: '#31AFB4',
+      borderColor: 'transparent',
+      elevation: 0.50,
   },
 });

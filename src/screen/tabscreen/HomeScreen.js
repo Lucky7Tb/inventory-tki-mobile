@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import { View, Image, BackHandler, Alert, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Image, BackHandler, Alert, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView,
+  RefreshControl, SafeAreaView } from 'react-native';
 import { Header, Text, Avatar, Overlay } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'react-native-axios';
@@ -22,6 +23,7 @@ export default class HomeScreen extends Component {
         nottaken: '',
         returned: '',
       },
+      refreshloader: false,
       loading: true,
       overlay: false
     };
@@ -86,7 +88,7 @@ export default class HomeScreen extends Component {
     const user_id = await AsyncStorage.getItem('userId');
     axios.request({
       method: "POST",
-      url: "http://192.168.0.5:8000/api/v1/getstudentdata",
+      url: "http://192.168.0.4:8000/api/v1/getstudentdata",
       data:{
         student_id : user_id
       }
@@ -106,12 +108,24 @@ export default class HomeScreen extends Component {
     })
   };
 
+  wait = timeout => {
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  }
+
+  refresh = () => {
+    this.setState({refreshloader: true})
+    this.getUserData()
+    this.wait(2000).then( () => this.setState({refreshloader: false}) )
+  };
+
   render() {
     const { navigation } = this.props;
     if(this.state.loading){
       return(
         <View style={styles.loader}>
-          <ActivityIndicator size="large" color="#0c9"/>
+          <ActivityIndicator size="large" color="#31AFB4"/>
         </View>
     )}
 
@@ -119,12 +133,7 @@ export default class HomeScreen extends Component {
       <View style={{height: 550}}>
           <Header
             placement="left"
-            leftComponent={
-              <Image
-		        source={require('../../assets/logo.png')}
-		        style={{width: 100, height: 100, marginBottom: 20}}
-  			   />
-            }
+            backgroundColor="#31AFB4"
             rightComponent={
               <Icon
                 name="bars"
@@ -135,87 +144,92 @@ export default class HomeScreen extends Component {
               />
             }
           />
-          <View style={{flex: 1, justifyContent: 'space-around', flexDirection: 'row'}}>
+          <SafeAreaView>
+            <ScrollView
+              refreshControl={
+                <RefreshControl refreshing={this.state.refreshloader} onRefresh={this.refresh} />
+              }
+            >
+              <View style={{flex: 1, justifyContent: 'space-around', flexDirection: 'row'}}>
 
-            <View style={{flex:1, justifyContent: 'space-around', flexDirection: 'row', marginTop: 100}}>
+                <View style={{flex:1, justifyContent: 'space-around', flexDirection: 'row', marginTop: 100}}>
 
-              <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
+                  <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
 
-                <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
+                    <Avatar overlayContainerStyle={{backgroundColor: '#31AFB4'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
 
-                <Text>{this.state.data.borrowing}</Text>
+                    <Text>{this.state.data.borrowing}</Text>
 
-                <Text>Dipinjam</Text>
+                    <Text>Dipinjam</Text>
 
-              </View>
+                  </View>
 
-              <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
+                  <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
 
-                <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
+                    <Avatar overlayContainerStyle={{backgroundColor: '#31AFB4'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
 
-                <Text>{this.state.data.returned}</Text>
+                    <Text>{this.state.data.returned}</Text>
 
-                <Text>Dikembalikan</Text>
+                    <Text>Dikembalikan</Text>
 
-              </View>
+                  </View>
 
-            </View>
-
-          </View>
-
-          <View style={{flex: 1, justifyContent: 'space-around', flexDirection: 'row'}}>
-            <View style={{flex:1, justifyContent: 'space-around', flexDirection: 'row'}}>
-              <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
-
-               <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
-
-                <Text>{this.state.data.nottaken}</Text>
-
-                <Text>Belum Diambil</Text>
+                </View>
 
               </View>
 
-              <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
+              <View style={{flex: 1, justifyContent: 'space-around', flexDirection: 'row'}}>
+                <View style={{flex:1, justifyContent: 'space-around', flexDirection: 'row', marginTop:50}}>
+                  <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
 
-               <Avatar overlayContainerStyle={{backgroundColor: 'red'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
+                   <Avatar overlayContainerStyle={{backgroundColor: '#31AFB4'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
 
-                <Text>{this.state.data.notreturn}</Text>
+                    <Text>{this.state.data.nottaken}</Text>
 
-                <Text>Belum dikembalikan</Text>
+                    <Text>Belum Diambil</Text>
 
+                  </View>
+
+                  <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
+
+                   <Avatar overlayContainerStyle={{backgroundColor: '#31AFB4'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
+
+                    <Text>{this.state.data.notreturn}</Text>
+
+                    <Text>Belum dikembalikan</Text>
+
+                  </View>
+                
+                </View>
               </View>
-            
-            </View>
-          </View>
+            </ScrollView>
+          </SafeAreaView>
+      		<Overlay
+      		  isVisible={this.state.overlay}
+      		  width={250}
+      		  height={250}
+      		  onBackdropPress={this.closeSettingsMenu}
+      		>
+      		  <View style={{flex:1}}>
+      		  	<View style={{flex: 1, justifyContent: 'center'}}>
+      		  		<TouchableOpacity
+      		  			style={styles.buttonStyle}
+              		onPress={this.changePassword}
+      		  		>
+      		  			<Text style={{color:'#31AFB4'}}>Ganti Password</Text>
+      		  		</TouchableOpacity>
+      		  	</View>
+      		  	<View style={{flex: 1, justifyContent: 'center'}}>
+      		  		<TouchableOpacity
+      		  			style={styles.buttonStyle}
+              		onPress={this.logout}
+      		  		>
+      		  			<Text style={{color:'#31AFB4'}}>Logout</Text>
+      		  		</TouchableOpacity>
+      		  	</View>
+      		  </View>
 
-
-		<Overlay
-		  isVisible={this.state.overlay}
-		
-		  width={250}
-		  height={250}
-		  onBackdropPress={this.closeSettingsMenu}
-		>
-		  <View style={{flex:1}}>
-		  	<View style={{flex: 1, justifyContent: 'center'}}>
-		  		<TouchableOpacity
-		  			style={styles.buttonStyle}
-        			onPress={this.changePassword}
-		  		>
-		  			<Text style={{color:'#039be5'}}>Ganti Password</Text>
-		  		</TouchableOpacity>
-		  	</View>
-		  	<View style={{flex: 1, justifyContent: 'center'}}>
-		  		<TouchableOpacity
-		  			style={styles.buttonStyle}
-        			onPress={this.logout}
-		  		>
-		  			<Text style={{color:'#039be5'}}>Logout</Text>
-		  		</TouchableOpacity>
-		  	</View>
-		  </View>
-
-		</Overlay>
+      		</Overlay>
 
       </View>
     );
@@ -230,7 +244,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff"
    },
    buttonStyle:{
-   	backgroundColor: "#fff",
-   	alignItems: 'center',
+   	backgroundColor: "transparent",
+    justifyContent: "center",
+   	alignItems: "center",
+    height:50
    }
 })

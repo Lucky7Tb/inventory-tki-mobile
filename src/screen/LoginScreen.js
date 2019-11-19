@@ -29,7 +29,7 @@ export default class LoginScreen extends Component {
     axios
       .request({
         method: 'POST',
-        url: 'http://192.168.0.5:8000/api/v1/auth',
+        url: 'http://192.168.0.4:8000/api/v1/auth',
         data: {
           Nis: this.state.Nis,
           Password: this.state.Password,
@@ -69,7 +69,7 @@ export default class LoginScreen extends Component {
     });
     axios.request({
         method: 'POST',
-        url: 'http://192.168.43.84:8000/api/v1/student',
+        url: 'http://192.168.0.4:8000/api/v1/student',
         data: {
           student_id: user_id,
           player_id: device.userId,

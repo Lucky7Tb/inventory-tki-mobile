@@ -18,7 +18,7 @@ const HomeStack = createStackNavigator({
   Home: {
     screen: Home,
     navigationOptions: {
-      header: null // Will hide header for HomePage
+      header: null
     }
   },
   ...Route
@@ -28,7 +28,7 @@ const BorrowStack = createStackNavigator({
   Borrow: {
     screen: Borrow,
     navigationOptions: {
-      header: null // Will hide header for HomePage
+      header: null
     }
   },
   ...Route
@@ -38,7 +38,7 @@ const HistoryStack = createStackNavigator({
   History: {
     screen: History,
     navigationOptions: {
-      header: null // Will hide header for HomePage
+      header: null
     }
   },
   ...Route
@@ -88,9 +88,6 @@ const TabNavigator = createMaterialBottomTabNavigator(
         tabBarIcon: ({tintColor}) => (
           <Icon name="home" size={20} style={[{color: tintColor}]} />
         ),
-        barStyle: {
-          backgroundColor: '#039be5',
-        },
       },
     },
     Borrow: {
@@ -102,9 +99,6 @@ const TabNavigator = createMaterialBottomTabNavigator(
         tabBarIcon: ({tintColor}) => (
           <Icon name="archive" size={20} style={[{color: tintColor}]} />
         ),
-        barStyle: {
-          backgroundColor: '#039be5',
-        },
       },
     },
     History: {
@@ -116,7 +110,6 @@ const TabNavigator = createMaterialBottomTabNavigator(
         tabBarIcon: ({tintColor}) => (
           <Icon name="list-alt" size={20} style={[{color: tintColor}]} />
         ),
-        barStyle: {backgroundColor: '#039be5'},
       },
     },
   },
@@ -128,7 +121,7 @@ const TabNavigator = createMaterialBottomTabNavigator(
     tabBarIcon: {
       focused: true,
     },
-    barStyle: {backgroundColor: '#3BAD87', zIndex: -9},
+    barStyle: {backgroundColor: '#31AFB4', zIndex: -9},
   },
 );
 
