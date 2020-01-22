@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {Input, Button, Image} from 'react-native-elements';
-import {StyleSheet, View, BackHandler, Alert} from 'react-native';
+import React, { Component } from 'react';
+import { Input, Button, Image } from 'react-native-elements';
+import { StyleSheet, View, BackHandler, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
 import OneSignal from 'react-native-onesignal';
@@ -25,11 +25,11 @@ export default class LoginScreen extends Component {
   }
 
   Login = () => {
-    this.setState({loading: true, disabled: true});
+    this.setState({ loading: true, disabled: true });
     axios
       .request({
         method: 'POST',
-        url: 'http://192.168.0.4:8000/api/v1/auth',
+        url: 'https://inventorytki.000webhostapp.com/api/v1/auth',
         data: {
           Nis: this.state.Nis,
           Password: this.state.Password,
@@ -42,7 +42,7 @@ export default class LoginScreen extends Component {
               'userId',
               response.data.serve.student_id,
             );
-            this.setState({loading: false, disabled: false});
+            this.setState({ loading: false, disabled: false });
             OneSignal.addEventListener('ids', this.onIds);
             this.props.navigation.navigate('Home');
           } catch (e) {
@@ -53,11 +53,12 @@ export default class LoginScreen extends Component {
             'Nis atau password salah',
             'Harap cek kembali nis dan password',
           );
-          this.setState({loading: false, disabled: false});
+          this.setState({ loading: false, disabled: false });
         }
       })
       .catch(err => {
-        this.setState({loading: false, disabled: false});
+        this.setState({ loading: false, disabled: false });
+        console.log(err)
         Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve");
       });
   };
@@ -68,15 +69,15 @@ export default class LoginScreen extends Component {
       user_id: user_id,
     });
     axios.request({
-        method: 'POST',
-        url: 'http://192.168.0.4:8000/api/v1/student',
-        data: {
-          student_id: user_id,
-          player_id: device.userId,
-        },
-      }).then(response => {
+      method: 'POST',
+      url: 'https://inventorytki.000webhostapp.com/api/v1/student',
+      data: {
+        student_id: user_id,
+        player_id: device.userId,
+      },
+    }).then(response => {
 
-      })
+    })
       .catch(err => {
         Alert.alert("Terjadi kesalahan", "Maaf telah terjadi kesalahan pada serve");
         console.log(err)
@@ -106,7 +107,7 @@ export default class LoginScreen extends Component {
         <View style={styles.form2}>
           <Image
             source={require('../assets/logo.png')}
-            style={{width: 200, height: 200}}
+            style={{ width: 200, height: 200 }}
           />
         </View>
         <View style={styles.form}>
@@ -117,7 +118,7 @@ export default class LoginScreen extends Component {
             label="Nis"
             labelStyle={styles.label}
             placeholder="e.g 171810518"
-            onChangeText={Nis => this.setState({Nis})}
+            onChangeText={Nis => this.setState({ Nis })}
             leftIcon={<Icon name="user" size={20} color="#31AFB4" />}
           />
           <Input
@@ -128,14 +129,14 @@ export default class LoginScreen extends Component {
             labelStyle={styles.label}
             secureTextEntry={true}
             placeholder="Password"
-            onChangeText={Password => this.setState({Password})}
+            onChangeText={Password => this.setState({ Password })}
             leftIcon={<Icon name="lock" size={20} color="#31AFB4" />}
           />
 
           <View style={styles.loginbuttoncontainer}>
             <Button
               buttonStyle={styles.loginbutton}
-              titleStyle={{fontWeight: 'bold', fontSize:15}}
+              titleStyle={{ fontWeight: 'bold', fontSize: 15 }}
               onPress={this.Login}
               title="LOGIN"
               loading={this.state.loading}
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
     borderColor: '#31AFB4',
     backgroundColor: '#fff',
   },
-  iconcontainer:{
+  iconcontainer: {
     marginRight: 10
   },
   form: {

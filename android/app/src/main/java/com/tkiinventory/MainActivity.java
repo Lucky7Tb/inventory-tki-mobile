@@ -1,4 +1,4 @@
-package com.inventory;
+package com.tkiinventory;
 
 import com.facebook.react.ReactActivity;
 

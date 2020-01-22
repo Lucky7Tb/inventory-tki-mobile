@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
-import {createAppContainer} from 'react-navigation';
-import {createStackNavigator} from 'react-navigation-stack';
-import {createMaterialBottomTabNavigator} from 'react-navigation-material-bottom-tabs';
+import React, { Component } from 'react';
+import { DrawerNavigator, createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import History from './tabscreen/HistoryScreen';
 import Borrow from './tabscreen/BorrowScreen';
@@ -85,8 +85,8 @@ const TabNavigator = createMaterialBottomTabNavigator(
         tabBarLabel: 'Home',
         activeColor: '#ffffff',
         inactiveColor: '#34515e',
-        tabBarIcon: ({tintColor}) => (
-          <Icon name="home" size={20} style={[{color: tintColor}]} />
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="home" size={20} style={[{ color: tintColor }]} />
         ),
       },
     },
@@ -96,8 +96,8 @@ const TabNavigator = createMaterialBottomTabNavigator(
         tabBarLabel: 'Peminjaman',
         activeColor: '#ffffff',
         inactiveColor: '#34515e',
-        tabBarIcon: ({tintColor}) => (
-          <Icon name="archive" size={20} style={[{color: tintColor}]} />
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="archive" size={20} style={[{ color: tintColor }]} />
         ),
       },
     },
@@ -107,8 +107,8 @@ const TabNavigator = createMaterialBottomTabNavigator(
         tabBarLabel: 'History',
         activeColor: '#ffffff',
         inactiveColor: '#34515e',
-        tabBarIcon: ({tintColor}) => (
-          <Icon name="list-alt" size={20} style={[{color: tintColor}]} />
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name="list-alt" size={20} style={[{ color: tintColor }]} />
         ),
       },
     },
@@ -121,8 +121,9 @@ const TabNavigator = createMaterialBottomTabNavigator(
     tabBarIcon: {
       focused: true,
     },
-    barStyle: {backgroundColor: '#31AFB4', zIndex: -9},
+    barStyle: { backgroundColor: '#31AFB4', zIndex: -9 },
   },
 );
+
 
 export default createAppContainer(TabNavigator);

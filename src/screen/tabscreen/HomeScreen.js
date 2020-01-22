@@ -1,12 +1,15 @@
-import React, {Component} from 'react';
-import { View, Image, BackHandler, Alert, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView,
-  RefreshControl, SafeAreaView } from 'react-native';
+import React, { Component } from 'react';
+import {
+  View, BackHandler, Alert, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView,
+  RefreshControl, SafeAreaView
+} from 'react-native';
 import { Header, Text, Avatar, Overlay } from 'react-native-elements';
+import { withNavigation } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from 'react-native-axios';
 import AsyncStorage from '@react-native-community/async-storage';
 
-export default class HomeScreen extends Component {
+class HomeScreen extends Component {
   constructor(props) {
     super(props);
     this._signOutAsync = this._signOutAsync.bind(this);
@@ -31,45 +34,51 @@ export default class HomeScreen extends Component {
 
   _signOutAsync = async () => {
     await AsyncStorage.clear();
-    this.setState({overlay: false});
+    this.setState({ overlay: false });
     this.props.navigation.navigate("Login");
   };
 
   logout = () => {
-  	Alert.alert(
-  		"Konfirmasi", 
-  		"Anda yakin ingin keluar",
-  		[
-		    { text: 'Cancel' },
-		    { text: 'Ok', onPress: this._signOutAsync },
-	  	],
-  	)
+    Alert.alert(
+      "Konfirmasi",
+      "Anda yakin ingin keluar",
+      [
+        { text: 'Cancel' },
+        { text: 'Ok', onPress: this._signOutAsync },
+      ],
+    )
   };
 
   changePassword = () => {
-  	this.setState({overlay: false});
-  	this.props.navigation.navigate('ChangePassword');
+    this.setState({ overlay: false });
+    this.props.navigation.navigate('ChangePassword');
   }
 
   showSettingsMenu = () => {
-   	this.setState({overlay: true})
+    this.setState({ overlay: true })
   };
 
   closeSettingsMenu = () => {
-   	this.setState({overlay: false})
+    this.setState({ overlay: false })
   };
 
   componentDidMount() {
+    const { navigation } = this.props;
     this.backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       this.handleBackPress,
     );
-    this.getUserId();
-    this.getUserData();
+    this.focusListener = navigation.addListener('didFocus', () => {
+      console.log('Hallo homescreen is focus')
+      this.setState({ loading: true });
+      this.getUserId();
+      this.getUserData();
+    });
   };
 
   componentWillUnmount() {
     this.backHandler.remove();
+    this.focusListener.remove();
   };
 
   handleBackPress = () => {
@@ -77,7 +86,7 @@ export default class HomeScreen extends Component {
     return true;
   };
 
-  getUserId  = async () => {
+  getUserId = async () => {
     const user_id = await AsyncStorage.getItem('userId');
     this.setState({
       user_id: user_id,
@@ -88,9 +97,9 @@ export default class HomeScreen extends Component {
     const user_id = await AsyncStorage.getItem('userId');
     axios.request({
       method: "POST",
-      url: "http://192.168.0.4:8000/api/v1/getstudentdata",
-      data:{
-        student_id : user_id
+      url: "https://inventorytki.000webhostapp.com/api/v1/getstudentdata",
+      data: {
+        student_id: user_id
       }
     }).then(response => {
       this.setState({
@@ -115,121 +124,124 @@ export default class HomeScreen extends Component {
   }
 
   refresh = () => {
-    this.setState({refreshloader: true})
-    this.getUserData()
-    this.wait(2000).then( () => this.setState({refreshloader: false}) )
+    this.setState({ refreshloader: true })
+    this.getUserData();
+    this.wait(2000).then(() => this.setState({ refreshloader: false }))
   };
 
   render() {
-    const { navigation } = this.props;
-    if(this.state.loading){
-      return(
+    if (this.state.loading) {
+      return (
         <View style={styles.loader}>
-          <ActivityIndicator size="large" color="#31AFB4"/>
+          <ActivityIndicator size="large" color="#31AFB4" />
         </View>
-    )}
+      )
+    }
 
     return (
-      <View style={{height: 550}}>
-          <Header
-            placement="left"
-            backgroundColor="#31AFB4"
-            rightComponent={
-              <Icon
-                name="bars"
-                color="#fff"
-                size={20}
-                style={{marginBottom: 20}}
-                onPress={this.showSettingsMenu}
-              />
+      <View style={{ height: 550 }}>
+        <Header
+          placement="left"
+          backgroundColor="#31AFB4"
+          leftComponent={
+            <Text h4 style={{ color: '#fff', marginBottom: '40%' }}>Home</Text>
+          }
+          rightComponent={
+            <Icon
+              name="bars"
+              color="#fff"
+              size={20}
+              style={{ marginBottom: 20 }}
+              onPress={this.showSettingsMenu}
+            />
+          }
+        />
+        <SafeAreaView>
+          <ScrollView
+            refreshControl={
+              <RefreshControl refreshing={this.state.refreshloader} onRefresh={this.refresh} />
             }
-          />
-          <SafeAreaView>
-            <ScrollView
-              refreshControl={
-                <RefreshControl refreshing={this.state.refreshloader} onRefresh={this.refresh} />
-              }
-            >
-              <View style={{flex: 1, justifyContent: 'space-around', flexDirection: 'row'}}>
+          >
+            <View style={{ flex: 1, justifyContent: 'space-around', flexDirection: 'row' }}>
 
-                <View style={{flex:1, justifyContent: 'space-around', flexDirection: 'row', marginTop: 100}}>
+              <View style={{ flex: 1, justifyContent: 'space-around', flexDirection: 'row', marginTop: 100 }}>
 
-                  <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
+                <View style={{ width: 150, height: 100, justifyContent: "center", alignItems: "center" }}>
 
-                    <Avatar overlayContainerStyle={{backgroundColor: '#31AFB4'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
+                  <Avatar overlayContainerStyle={{ backgroundColor: '#31AFB4' }} size="medium" rounded icon={{ name: 'arrow-down', type: 'material-community' }} />
 
-                    <Text>{this.state.data.borrowing}</Text>
+                  <Text>{this.state.data.borrowing}</Text>
 
-                    <Text>Dipinjam</Text>
+                  <Text>Dipinjam</Text>
 
-                  </View>
+                </View>
 
-                  <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
+                <View style={{ width: 150, height: 100, justifyContent: "center", alignItems: "center" }}>
 
-                    <Avatar overlayContainerStyle={{backgroundColor: '#31AFB4'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
+                  <Avatar overlayContainerStyle={{ backgroundColor: '#31AFB4' }} size="medium" rounded icon={{ name: 'arrow-up', type: 'material-community' }} />
 
-                    <Text>{this.state.data.returned}</Text>
+                  <Text>{this.state.data.returned}</Text>
 
-                    <Text>Dikembalikan</Text>
-
-                  </View>
+                  <Text>Dikembalikan</Text>
 
                 </View>
 
               </View>
 
-              <View style={{flex: 1, justifyContent: 'space-around', flexDirection: 'row'}}>
-                <View style={{flex:1, justifyContent: 'space-around', flexDirection: 'row', marginTop:50}}>
-                  <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
+            </View>
 
-                   <Avatar overlayContainerStyle={{backgroundColor: '#31AFB4'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
+            <View style={{ flex: 1, justifyContent: 'space-around', flexDirection: 'row' }}>
+              <View style={{ flex: 1, justifyContent: 'space-around', flexDirection: 'row', marginTop: 50 }}>
+                <View style={{ width: 150, height: 100, justifyContent: "center", alignItems: "center" }}>
 
-                    <Text>{this.state.data.nottaken}</Text>
+                  <Avatar overlayContainerStyle={{ backgroundColor: '#31AFB4' }} size="medium" rounded icon={{ name: 'archive', type: 'font-awesome' }} />
 
-                    <Text>Belum Diambil</Text>
+                  <Text>{this.state.data.nottaken}</Text>
 
-                  </View>
+                  <Text>Belum Diambil</Text>
 
-                  <View style={{width: 150, height: 100, justifyContent: "center",alignItems: "center"}}>
-
-                   <Avatar overlayContainerStyle={{backgroundColor: '#31AFB4'}} size="medium" rounded icon={{ name: 'archive', type:'font-awesome'}}  />
-
-                    <Text>{this.state.data.notreturn}</Text>
-
-                    <Text>Belum dikembalikan</Text>
-
-                  </View>
-                
                 </View>
-              </View>
-            </ScrollView>
-          </SafeAreaView>
-      		<Overlay
-      		  isVisible={this.state.overlay}
-      		  width={250}
-      		  height={250}
-      		  onBackdropPress={this.closeSettingsMenu}
-      		>
-      		  <View style={{flex:1}}>
-      		  	<View style={{flex: 1, justifyContent: 'center'}}>
-      		  		<TouchableOpacity
-      		  			style={styles.buttonStyle}
-              		onPress={this.changePassword}
-      		  		>
-      		  			<Text style={{color:'#31AFB4'}}>Ganti Password</Text>
-      		  		</TouchableOpacity>
-      		  	</View>
-      		  	<View style={{flex: 1, justifyContent: 'center'}}>
-      		  		<TouchableOpacity
-      		  			style={styles.buttonStyle}
-              		onPress={this.logout}
-      		  		>
-      		  			<Text style={{color:'#31AFB4'}}>Logout</Text>
-      		  		</TouchableOpacity>
-      		  	</View>
-      		  </View>
 
-      		</Overlay>
+                <View style={{ width: 150, height: 100, justifyContent: "center", alignItems: "center" }}>
+
+                  <Avatar overlayContainerStyle={{ backgroundColor: '#31AFB4' }} size="medium" rounded icon={{ name: 'timer-sand', type: 'material-community' }} />
+
+                  <Text>{this.state.data.notreturn}</Text>
+
+                  <Text>Belum dikembalikan</Text>
+
+                </View>
+
+              </View>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+        <Overlay
+          isVisible={this.state.overlay}
+          width={250}
+          height={250}
+          onBackdropPress={this.closeSettingsMenu}
+        >
+          <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <TouchableOpacity
+                style={styles.buttonStyle}
+                onPress={this.changePassword}
+              >
+                <Text style={{ color: '#31AFB4' }}>Ganti Password</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <TouchableOpacity
+                style={styles.buttonStyle}
+                onPress={this.logout}
+              >
+                <Text style={{ color: '#31AFB4' }}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+        </Overlay>
 
       </View>
     );
@@ -237,16 +249,18 @@ export default class HomeScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-   loader:{
+  loader: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff"
-   },
-   buttonStyle:{
-   	backgroundColor: "transparent",
+  },
+  buttonStyle: {
+    backgroundColor: "transparent",
     justifyContent: "center",
-   	alignItems: "center",
-    height:50
-   }
+    alignItems: "center",
+    height: 50
+  }
 })
+
+export default withNavigation(HomeScreen);

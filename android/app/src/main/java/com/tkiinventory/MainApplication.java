@@ -1,4 +1,4 @@
-package com.inventory;
+package com.tkiinventory;
 
 import android.app.Application;
 import android.content.Context;

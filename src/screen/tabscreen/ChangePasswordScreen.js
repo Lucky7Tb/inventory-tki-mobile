@@ -6,71 +6,72 @@ import axios from 'react-native-axios';
 
 export default class ChangePasswordScreen extends Component {
 	static navigationOptions = {
-    	title: 'Ganti password',
-  	};
+		title: 'Ganti password',
+	};
 
-  	constructor(props) {
-  	  super(props);
-  	  this.changePassword = this.changePassword.bind(this);
-  	  this.state = {
-		password: '',
-		confirmpassword: '',
-  	  };
-  	}
+	constructor(props) {
+		super(props);
+		this.changePassword = this.changePassword.bind(this);
+		this.state = {
+			password: '',
+			confirmpassword: '',
+		};
+	}
 
-  	changePassword = async () => {
-  		let { password, confirmpassword } = this.state;
-  		const user_id = await AsyncStorage.getItem('userId');
-  		if(password !== confirmpassword){
-  			Alert.alert("Kesalahan", "Password tidak sama!!")
-  		}else{
-  			axios.request({
-  				method: 'POST',
-  				url: 'http://192.168.0.4:8000/api/v1/studentchangepassword',
-  				data: {
-  					student_id : user_id,
-  					student_password: password
-  				}
-  			}).then(response => {
-  				Alert.alert("Berhasil", response.data.message);
-  				this.props.navigation.goBack();
-  			}).catch(error => {
-    			Alert.alert("Terjadi kesalahan", "Telah terjadi kesalahan")
-  			})
-  		}
-  	}
+	changePassword = async () => {
+		let { password, confirmpassword } = this.state;
+		const user_id = await AsyncStorage.getItem('userId');
+		if (password !== confirmpassword) {
+			Alert.alert("Kesalahan", "Password tidak sama!!")
+		} else {
+			axios.request({
+				method: 'POST',
+				url: 'https://inventorytki.000webhostapp.com/api/v1/studentchangepassword',
+				data: {
+					student_id: user_id,
+					student_password: password
+				}
+			}).then(response => {
+				Alert.alert("Berhasil", response.data.message);
+				this.props.navigation.goBack();
+			}).catch(error => {
+				console.log(error)
+				Alert.alert("Terjadi kesalahan", "Telah terjadi kesalahan")
+			})
+		}
+	}
 
-  render() {
-    return (
-      <View style={styles.container}>
-     	<Input
-          inputContainerStyle={styles.fieldcontainer}
-          labelStyle={styles.label}
-          label="Password baru"
-          secureTextEntry={true}
-          onChangeText={password => this.setState({password})}
-        />
+	render() {
+		return (
+			<View style={styles.container}>
+				<Input
+					inputContainerStyle={styles.fieldcontainer}
+					labelStyle={styles.label}
+					label="Password baru"
+					secureTextEntry={true}
+					onChangeText={password => this.setState({ password })}
+				/>
 
-        <Input
-          inputContainerStyle={styles.fieldcontainer}
-          labelStyle={styles.label}
-          label="Konfirmasi password"
-          secureTextEntry={true}
-          onChangeText={confirmpassword => this.setState({confirmpassword})}
-        />
+				<Input
+					inputContainerStyle={styles.fieldcontainer}
+					labelStyle={styles.label}
+					label="Konfirmasi password"
+					secureTextEntry={true}
+					onChangeText={confirmpassword => this.setState({ confirmpassword })}
+				/>
 
-        <View style={styles.buttonContainer}>
-          <Button
-            onPress={this.changePassword}
-            title="Save"
-            type="solid"
-            raised={true}
-            buttonStyle={styles.submitButton}
-          />
-        </View>
-      </View>
-    );
-  }
+				<View style={styles.buttonContainer}>
+					<Button
+						onPress={this.changePassword}
+						title="Save"
+						type="solid"
+						raised={true}
+						buttonStyle={styles.submitButton}
+					/>
+				</View>
+			</View>
+		);
+	}
 }
 
 const styles = StyleSheet.create({
@@ -80,18 +81,18 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	fieldcontainer: {
-    	borderStyle: 'solid',
-	    borderWidth: 1,
-	    borderRadius: 10,
-	    borderColor: '#31AFB4',
-	    backgroundColor: '#fff',
-	    marginBottom: 20
-  	},
-   submitButton: {
-	    borderRadius: 25,
-	    width: 250,
-      backgroundColor: '#31AFB4',
-      borderColor: 'transparent',
-      elevation: 0.50,
-  },
+		borderStyle: 'solid',
+		borderWidth: 1,
+		borderRadius: 10,
+		borderColor: '#31AFB4',
+		backgroundColor: '#fff',
+		marginBottom: 20
+	},
+	submitButton: {
+		borderRadius: 25,
+		width: 250,
+		backgroundColor: '#31AFB4',
+		borderColor: 'transparent',
+		elevation: 0.50,
+	},
 });
